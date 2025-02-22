@@ -5,10 +5,17 @@ import { generateClient } from 'aws-amplify/api';
 import { createTodo } from './graphql/mutations';
 import { listTodos } from './graphql/queries';
 
+import {
+  withAuthenticator, Button, Heading, Text,
+  TextField,
+  View
+} from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
+
 const initialState = { name: '', description: '' };
 const client = generateClient();
 
-const App = () => {
+const App = ({ signOut, user }) => {
   const [formState, setFormState] = useState(initialState);
   const [todos, setTodos] = useState([]);
 
@@ -50,30 +57,34 @@ const App = () => {
   }
 
   return (
-    <div style={styles.container}>
-      <h2>Amplify Todos</h2>
-      <input
+    <View style={styles.container}>
+      <Heading level={1}>Hello {user.username}</Heading>
+      <Button style={styles.button} onClick={signOut}>
+        Sign out
+      </Button>
+      <Heading level={2}>Amplify Todos</Heading>
+      <TextField
+        placeholder="Name"
         onChange={(event) => setInput('name', event.target.value)}
         style={styles.input}
-        value={formState.name}
-        placeholder="Name"
+        defaultValue={formState.name}
       />
-      <input
+      <TextField
+        placeholder="Description"
         onChange={(event) => setInput('description', event.target.value)}
         style={styles.input}
-        value={formState.description}
-        placeholder="Description"
+        defaultValue={formState.description}
       />
-      <button style={styles.button} onClick={addTodo}>
+      <Button style={styles.button} onClick={addTodo}>
         Create Todo
-      </button>
+      </Button>
       {todos.map((todo, index) => (
-        <div key={todo.id ? todo.id : index} style={styles.todo}>
-          <p style={styles.todoName}>{todo.name}</p>
-          <p style={styles.todoDescription}>{todo.description}</p>
-        </div>
+        <View key={todo.id ? todo.id : index} style={styles.todo}>
+          <Text style={styles.todoName}>{todo.name}</Text>
+          <Text style={styles.todoDescription}>{todo.description}</Text>
+        </View>
       ))}
-    </div>
+    </View>
   );
 };
 
@@ -105,4 +116,4 @@ const styles = {
   }
 };
 
-export default App;
+export default withAuthenticator(App);
